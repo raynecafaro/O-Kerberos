@@ -1,5 +1,4 @@
-from flask import Flask, jsonify
-from flask import request
+from flask import Flask, jsonify, request
 import requests
 import json
 import hashlib
@@ -16,29 +15,35 @@ def login():
     password = credentials['password']
 
     if username == '' or password == '':
-        return{'auth': 'fail', 'token': ''}
+        return jsonify({'auth': 'fail', 'token': ''})
 
     oauth_provider = oauth_consts.URL + ":" + oauth_consts.PORT + '/login'
     headers = {'Content-Type': 'application/json'}
     data = {'username': username, 'password': password}
     parsed_data = json.dumps(data)
 
-    response = requests.post(oauth_provider, headers=headers, data=parsed_data)
-    auth_status = response.json()['auth']
-    token = response.json()['token']
+    #response = requests.post(oauth_provider, headers=headers, data=parsed_data)
+    #auth_status = response.json()['auth']
+    #token = response.json()['token']
+
+    # Uncomment below and comment out 3 lines 
+    # above for testing without O-Auth provider
+    auth_status = 'success'
+    token = 'abc123'
 
     h = hashlib.sha256(password.encode('UTF-8'))
-    hashed_password = h.hexdigest()
+    ashed_password = h.hexdigest()
 
     if auth_status == 'success' and token != '':
         # TODO: insert crypto
 
-        return{'auth': 'success', 'token': token}
+        return jsonify({'auth': 'success', 'token': token})
     else:
-        return{'auth': 'fail', 'token': ''}
+        return jsonify({'auth': 'fail', 'token': ''})
 
 def main():
-    app.run(host=auth_consts.FLASK_HOST, port=auth_consts.FLASK_PORT)
+    #app.run(host=auth_consts.FLASK_HOST, port=auth_consts.FLASK_PORT)
+    app.run()
 
 if __name__ == '__main__':
     main()
