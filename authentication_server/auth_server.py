@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request
 import requests
 import json
-import hashlib
-#import libnacl
+import sha3
+import libnacl
 from config_constants import OAUTHConfig as oauth_consts
 from config_constants import AUTHServerConfig as auth_consts
 
@@ -19,20 +19,22 @@ def login():
 
     oauth_provider = oauth_consts.URL + ":" + oauth_consts.PORT + '/login'
     headers = {'Content-Type': 'application/json'}
-    data = {'username': username, 'password': password}
+    #data = {'username': username, 'password': password}
+    data = {"grant_type": "client_credentials","username": username,"password": password}
     parsed_data = json.dumps(data)
 
-    #response = requests.post(oauth_provider, headers=headers, data=parsed_data)
-    #auth_status = response.json()['auth']
-    #token = response.json()['token']
+    response = requests.post(oauth_provider, headers=headers, data=parsed_data)
+    auth_status = response.json()['auth']
+    token = response.json()['token']
 
     # Uncomment below and comment out 3 lines 
     # above for testing without O-Auth provider
-    auth_status = 'success'
-    token = 'abc123'
+    
+    # auth_status = 'success'
+    # token = 'abc123'
 
-    h = hashlib.sha256(password.encode('UTF-8'))
-    ashed_password = h.hexdigest()
+    h = sha3.sha3_256(password.encode())
+    hashed_password = h.digest()
 
     if auth_status == 'success' and token != '':
         # TODO: insert crypto
