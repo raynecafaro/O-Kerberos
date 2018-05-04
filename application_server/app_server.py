@@ -18,7 +18,8 @@ def index():
     
     try:
         decrypted_token = box.decrypt(data['token'].encode(), encoder=Base64Encoder)
-        return jsonify({'auth': 'success', 'token': decrypted_token})
+        print(decrypted_token)
+        return jsonify({'auth': 'success', 'token': decrypted_token.decode()})
     except:
         return jsonify({'auth': 'fail', 'token': ''})
     
