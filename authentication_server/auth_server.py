@@ -19,7 +19,7 @@ def login():
 
     oauth_provider = oauth_consts.URL + ":" + oauth_consts.PORT + '/token.php'
     headers = {'Content-Type': 'application/json'}
-    data = {"grant_type": "client_credentials","username": username,"password": password}
+    data = {"grant_type": "client_credentials","client_id": username,"client_secret": password}
     parsed_data = json.dumps(data)
 
     response = requests.post(oauth_provider, headers=headers, data=parsed_data)
@@ -28,7 +28,7 @@ def login():
     #h = sha3.sha3_256(password.encode())
     #hashed_password = h.digest()
 
-    if response.status_code == r.status_code and token != '':
+    if requests.codes.ok == response.status_code and token != '':
         # TODO: insert crypto
 
         return jsonify({'auth': 'success', 'token': token})
