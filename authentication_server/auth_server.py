@@ -17,26 +17,18 @@ def login():
     if username == '' or password == '':
         return jsonify({'auth': 'fail', 'token': ''})
 
-    oauth_provider = oauth_consts.URL + ":" + oauth_consts.PORT + '/login'
+    oauth_provider = oauth_consts.URL + ":" + oauth_consts.PORT + '/token.php'
     headers = {'Content-Type': 'application/json'}
-    #data = {'username': username, 'password': password}
     data = {"grant_type": "client_credentials","username": username,"password": password}
     parsed_data = json.dumps(data)
 
     response = requests.post(oauth_provider, headers=headers, data=parsed_data)
-    auth_status = response.json()['auth']
-    token = response.json()['token']
+    token = response.json()['access_token']
 
-    # Uncomment below and comment out 3 lines 
-    # above for testing without O-Auth provider
-    
-    # auth_status = 'success'
-    # token = 'abc123'
+    #h = sha3.sha3_256(password.encode())
+    #hashed_password = h.digest()
 
-    h = sha3.sha3_256(password.encode())
-    hashed_password = h.digest()
-
-    if auth_status == 'success' and token != '':
+    if response.status_code == r.status_code and token != '':
         # TODO: insert crypto
 
         return jsonify({'auth': 'success', 'token': token})
