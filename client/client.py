@@ -1,8 +1,27 @@
 import argparse
 import requests, json
 import hashlib
+import base64
 from nacl import secret
 from nacl.encoding import Base64Encoder
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
+
+def encrypt_creds(data):
+    key_text = ''
+    with open("./public.pem", "r") as f:
+        key_text = f.read()
+    
+    pubkey = RSA.importKey(key_text)
+
+    cipher = PKCS1_v1_5.new(pubkey)
+
+    ct = cipher.encrypt(data.encode())
+
+    ct = base64.b64encode(ct)
+    
+    print(ct)
+    return ct
 
 def arguments():
     parser = argparse.ArgumentParser(description='O-Kerberos Client')
@@ -20,8 +39,9 @@ def connect(args):
     headers = {'Content-Type' : 'application/json'}
     data = {'username': args.username, 'password': args.password}
     parsed_data = json.dumps(data)
+    encrypted_data = encrypt_creds(parsed_data) 
     
-    r = requests.post(args.connect,  headers=headers, data=parsed_data)
+    r = requests.post(args.connect,  headers=headers, data=encrypted_data)
     
     if 'response' in r.json():
         return r.json()['response']
