@@ -3,16 +3,39 @@ import requests
 import json
 import hashlib
 import libnacl
+import base64
 from nacl import secret
 from nacl.encoding import Base64Encoder
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
 from config_constants import OAUTHConfig as oauth_consts
 from config_constants import AUTHServerConfig as auth_consts
 
 app = Flask(__name__)
 
+def decrypt_creds(data):
+    with open("./private.pem") as f:
+        key_text = f.read()
+
+    privkey = RSA.importKey(key_text)
+
+    cipher = PKCS1_v1_5.new(privkey)
+
+    ct = base64.b64decode(data)
+
+    pt = cipher.decrypt(ct, None)
+    
+    print(pt.decode())
+    return json.loads(pt.decode())
+    
+
 @app.route('/login', methods=['POST'])
 def login():
-    credentials = request.get_json()
+    #credentials = request.get_json()
+    encrypted_credentials = request.get_data()
+    
+    credentials = decrypt_creds(encrypted_credentials)
+    
     username = credentials['username']
     password = credentials['password']
 
