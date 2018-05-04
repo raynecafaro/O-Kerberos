@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 import requests
 import json
-import sha3
+import hashlib
 import libnacl
 from nacl import secret
 from nacl.encoding import Base64Encoder
@@ -26,17 +26,20 @@ def login():
 
     response = requests.post(oauth_provider, headers=headers, data=parsed_data)
     token = response.json()['access_token']
+    print(response.text)
 
     if requests.codes.ok == response.status_code and token != '':
         box = secret.SecretBox(auth_consts.KEY)
         ct = box.encrypt(token.encode(), encoder=Base64Encoder)
         json_response = {'auth': 'success', 'token': ct.decode()}
-        
-        h = sha3.sha3_256(password.encode())
+        print(json_response)
+ 
+        h = hashlib.sha256(password.encode())
         password_box = secret.SecretBox(h.digest())
-        encrypted_json = password_box.encrypt(json.dumps(json_response)).encode(), encoder=Base64Encoder)
+        encrypted_json = password_box.encrypt(json.dumps(json_response).encode(), encoder=Base64Encoder)
+        print(encrypted_json)
 
-        return jsonify({'response': encrypted_message})
+        return jsonify({'response': encrypted_json.decode()})
     else:
         return jsonify({'auth': 'fail', 'token': ''})
 
