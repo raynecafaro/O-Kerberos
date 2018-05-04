@@ -3,6 +3,8 @@ import requests
 import json
 import sha3
 import libnacl
+from nacl import secret
+from nacl.encoding import Base64Encoder
 from config_constants import OAUTHConfig as oauth_consts
 from config_constants import AUTHServerConfig as auth_consts
 
@@ -25,13 +27,16 @@ def login():
     response = requests.post(oauth_provider, headers=headers, data=parsed_data)
     token = response.json()['access_token']
 
-    #h = sha3.sha3_256(password.encode())
-    #hashed_password = h.digest()
-
     if requests.codes.ok == response.status_code and token != '':
-        # TODO: insert crypto
+        box = secret.SecretBox(auth_consts.KEY)
+        ct = box.encrypt(token.encode(), encoder=Base64Encoder)
+        json_response = {'auth': 'success', 'token': ct.decode()}
+        
+        h = sha3.sha3_256(password.encode())
+        password_box = secret.SecretBox(h.digest())
+        encrypted_json = password_box.encrypt(json.dumps(json_response)).encode(), encoder=Base64Encoder)
 
-        return jsonify({'auth': 'success', 'token': token})
+        return jsonify({'response': encrypted_message})
     else:
         return jsonify({'auth': 'fail', 'token': ''})
 
