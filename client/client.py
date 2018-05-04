@@ -30,7 +30,7 @@ def connect(args):
     sys.exit(1)
     
 
-def decrypt_auth_response(response, args)
+def decrypt_auth_response(response, args):
     h = hashlib.sha256(args.password.encode())
     password_box = secret.SecretBox(h.digest())
     pt_response = password_box.decrypt(response.encode(), encoder=Base64Encoder)
