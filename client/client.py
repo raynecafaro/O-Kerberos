@@ -2,7 +2,7 @@ import argparse
 import requests, json
 import hashlib
 from nacl import secret
-from nacl import Base64Encoder
+from nacl.encoding import Base64Encoder
 
 def arguments():
     parser = argparse.ArgumentParser(description='O-Kerberos Client')

