@@ -9,7 +9,7 @@ Jinja2==2.10
 libnacl==1.6.1
 MarkupSafe==1.0
 pycparser==2.18
-pycrypto==2.6.1
+pycrypto
 PyNaCl==1.2.1
 requests==2.18.4
 sha3==0.2.1
