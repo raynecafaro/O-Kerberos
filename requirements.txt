@@ -11,7 +11,7 @@ MarkupSafe==1.0
 pycparser==2.18
 pycrypto
 PyNaCl==1.2.1
-requests==2.18.4
+requests>=2.20.0
 sha3==0.2.1
 six==1.11.0
 urllib3==1.22
